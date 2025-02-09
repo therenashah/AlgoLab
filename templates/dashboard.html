@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trading Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var socket = io();
+
+            function subscribeSymbol(symbol) {
+                socket.emit('subscribe_symbol', symbol);
+                updateTradingViewChart(symbol);
+            }
+
+            socket.on('price_update', function (prices) {
+                for (var symbol in prices) {
+                    var element = document.getElementById('price-' + symbol);
+                    if (element) {
+                        element.innerText = '$' + prices[symbol].toFixed(2);
+                    }
+                }
+            });
+        });
+
+        function updateTradingViewChart(symbol) {
+            document.getElementById('tradingview_chart').innerHTML = "";
+            new TradingView.widget({
+                "width": "100%",
+                "height": 600,
+                "symbol": symbol,
+                "interval": "D",
+                "timezone": "Etc/UTC",
+                "theme": "light",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "container_id": "tradingview_chart"
+            });
+        }
+    </script>
+</head>
+<body>
+    <h2>Welcome, {{ session.username }}!</h2>
+
+    <h3>Live Market Chart</h3>
+    <select id="chart_symbol" onchange="updateTradingViewChart(this.value)">
+        <option value="">Select a Symbol</option>
+        {% for market, symbols in markets.items() %}
+            {% for symbol in symbols %}
+                <option value="{{ symbol }}">{{ symbol }}</option>
+            {% endfor %}
+        {% endfor %}
+    </select>
+    <div id="tradingview_chart" style="width: 100%; height: 600px;"></div>
+
+    <h3>Place Order</h3>
+    <form action="/place_order" method="POST">
+        <label for="market">Market:</label>
+        <select name="market" id="market" required>
+            {% for market in markets.keys() %}
+                <option value="{{ market }}">{{ market }} Market</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="symbol">Symbol:</label>
+        <input type="text" name="symbol" id="symbol" placeholder="e.g., AAPL" required>
+        <br>
+        <label for="side">Side:</label>
+        <select name="side" id="side" required>
+            <option value="buy">Buy</option>
+            <option value="sell">Sell</option>
+        </select>
+        <br>
+        <label for="order_type">Order Type:</label>
+        <select name="order_type" id="order_type" required>
+            <option value="market">Market</option>
+            <option value="limit">Limit</option>
+            <option value="stop">Stop</option>
+            <option value="stop_limit">Stop Limit</option>
+        </select>
+        <br>
+        <label for="limit_price">Limit Price:</label>
+        <input type="number" name="limit_price" id="limit_price" step="0.01">
+        <br>
+        <label for="stop_price">Stop Price:</label>
+        <input type="number" name="stop_price" id="stop_price" step="0.01">
+        <br>
+        <label for="quantity">Quantity:</label>
+        <input type="number" name="quantity" id="quantity" required>
+        <br>
+        <button type="submit">Place Order</button>
+    </form>
+</body>
+</html>
