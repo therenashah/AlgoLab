@@ -1,62 +1,109 @@
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/VQjCRxaniI6
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
-import { Label } from "@/components/ui/label"
-import { input } from "@/components/ui/input"
-import { button } from "@/components/ui/button"
-import { signup } from "@/firebase/auth"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/router"
-import Link from "next/link"
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { signup } from "@/firebase/auth";
+import { useState } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
 
-export default function Component() {
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [username, setUsername] = useState("")
-    const [user, setUser] = useState(null);
+export default function Signup() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [username, setUsername] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
+    const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
+    const validatePassword = (password) =>
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+
     const handleSubmit = async () => {
+        setError("");
+        
+        if (!validateEmail(email)) {
+            setError("Invalid email address.");
+            return;
+        }
+        if (!validatePassword(password)) {
+            setError("Password must be 8+ characters, include 1 uppercase, 1 lowercase, and 1 number.");
+            return;
+        }
+
+        setLoading(true);
         try {
             const user = await signup(email, password, username);
-            setUser(user);
             router.push("/profiling");
-        } catch (error) {
-            console.error(error);
+        } catch (err) {
+            setError(err?.message || "Signup failed. Try again.");
         }
-    }
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-12">
-      <div className="mx-auto w-[400px] space-y-4">
-        <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">Sign Up</h1>
-          <p className="text-gray-500 dark:text-gray-400">Enter your information to create an account</p>
+        setLoading(false);
+    };
+
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+            <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6 space-y-4">
+                <h1 className="text-2xl font-bold text-center">Sign Up</h1>
+                <p className="text-gray-500 text-center">
+                    Enter your information to create an account.
+                </p>
+
+                {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
+                <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                        id="name"
+                        placeholder="Lee Robinson"
+                        required
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        placeholder="m@example.com"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <p className="text-xs text-gray-500">
+                        Must be 8+ characters, include 1 uppercase, 1 lowercase, and 1 number.
+                    </p>
+                </div>
+
+                <Button
+                    className="w-full bg-black text-white"
+                    type="submit"
+                    onClick={handleSubmit}
+                    disabled={loading}
+                >
+                    {loading ? "Signing Up..." : "Sign Up"}
+                </Button>
+
+                <p className="text-xs text-center text-gray-500">
+                    By clicking Sign Up, you agree to our{" "}
+                    <Link className="underline" href="#">
+                        Terms and Conditions
+                    </Link>.
+                </p>
+            </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="name ">Name</Label>
-          <input className="p-4 rounded" id="name" placeholder="Lee Robinson" required value={username} onChange={(event) => setUsername(event.currentTarget.value)}/>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <input id="email" placeholder="m@example.com" required value={email} onChange={(event) => setEmail(event.currentTarget.value)}/>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <input id="password" required type="password" value={password} onChange={(event) => setPassword(event.currentTarget.value)}/>
-        </div>
-        <button className="w-full bg-black text-white rounded h-fit" type="submit" onClick={handleSubmit}>
-          Sign Up
-        </button>
-        <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-          By clicking Sign Up, you agree to our
-          <Link className="underline" href="#">
-            Terms and Conditions
-          </Link>
-          .
-        </p>
-      </div>
-    </div>
-  )
+    );
 }
