@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/Navbar";
+import Navbar from "@/components/Navbar";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged } from "@/firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore"; 

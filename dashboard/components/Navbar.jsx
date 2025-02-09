@@ -1,95 +1,45 @@
-import Link from "next/link";
-import { onAuthStateChanged } from "../firebase/auth";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { signout } from "../firebase/auth";
-import Image from "next/image";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+'use client';
 
-export const Navbar = () => {
-  const [user, setUser] = useState(null);
-  const router = useRouter();
+import { useState } from 'react';
+import { Search, Bell, Moon, Sun, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
-  useEffect(() => {
-    onAuthStateChanged(async (user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-    });
-  }, []);
-
-  async function handleLogOut(e) {
-    e.preventDefault();
-    await signout();
-    router.push("/");
-  }
+export default function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="px-4 lg:px-6 h-14 flex items-center">
-      <Link className="flex items-center justify-center" href="#">
-        {/* Logo or Branding can be added here */}
-      </Link>
-
-      <nav className="flex items-center ml-auto space-x-4">
-        <Link href="/home">
-          <p className="text-gray-900 dark:text-gray-100">Home</p>
-        </Link>
-        <DropdownMenu>
-          <DropdownMenuTrigger>Portfolio</DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Your Portfolio</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <Link href="/portfolio/visuals"><DropdownMenuItem>Visualized</DropdownMenuItem></Link>
-            <Link href="/portfolio/stats"><DropdownMenuItem>Stats</DropdownMenuItem></Link>
-            <Link href="/portfolio/optimal"><DropdownMenuItem>Optimized Portfolio</DropdownMenuItem></Link>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <DropdownMenu>
-          <DropdownMenuTrigger>Insights</DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Global Insights</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <Link href="/assets/gold"><DropdownMenuItem>Gold</DropdownMenuItem></Link>
-            <Link href="/assets/stocks"><DropdownMenuItem>Stocks</DropdownMenuItem></Link>
-            <Link href="/assets/bonds"><DropdownMenuItem>Bonds</DropdownMenuItem></Link>
-            <Link href="/assets/mfs"><DropdownMenuItem>Mutual Funds</DropdownMenuItem></Link>
-            <Link href="/assets/news"><DropdownMenuItem>News</DropdownMenuItem></Link>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {user ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center space-x-2">
-              <p className="text-gray-900 dark:text-gray-100 font-semibold">{user.displayName || "User"}</p>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <Link href="/profile"><DropdownMenuItem>Profile</DropdownMenuItem></Link>
-              <DropdownMenuItem onClick={handleLogOut}>Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <>
-            <Link href="/login">
-              <p className="text-gray-900 dark:text-gray-100">Login</p>
-            </Link>
-            <Link href="/signup">
-              <p className="text-gray-900 dark:text-gray-100">Sign Up</p>
-            </Link>
-          </>
-        )}
-      </nav>
-    </header>
-  );
-};
+    <nav className='flex items-center justify-between bg-white dark:bg-gray-900 p-4 shadow-md'>
+      {/* Left - Branding & Search Bar */}
+      <div className='flex items-center space-x-4'>
+        <div className='relative'>
+          <Search className='absolute left-3 top-2 text-gray-400' size={18} />
+          <Input className='pl-10 w-72' placeholder='Search for a strategy...' />
+        </div>
+      </div>
       
+      {/* Right - Actions */}
+      <div className='flex items-center space-x-4'>
+        <Button className='bg-blue-600 text-white px-4 py-2'>+ Create Strategies Using AI</Button>
+        <Bell className='cursor-pointer text-gray-600 dark:text-white' size={24} />
+        
+        
+        {/* User Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className='flex items-center space-x-2 text-gray-700 dark:text-white'>
+              <span>Rena Shah</span>
+              <ChevronDown size={18} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end'>
+            <DropdownMenuItem onClick={() => console.log('Profile')}>Profile</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => console.log('Settings')}>Settings</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => console.log('Logout')}>Logout</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </nav>
+  );
+}

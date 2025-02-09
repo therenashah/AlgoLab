@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navbar } from "../components/Navbar"  // Adjust the path as needed
+import Navbar from "@/components/Navbar";  // Adjust the path as needed
 import Sidebar from "@/components/Sidebar"; // Adjust the path as needed
 
 export default function Dashboard() {
@@ -21,7 +21,7 @@ export default function Dashboard() {
             <p className="text-red-500">No Active Plan</p>
             <p className="text-red-500">No Expired Plan</p>
           </Card>
-          <Card title="AlgoBulls Money">
+          <Card title="AlgoLab Money">
             <div className="flex justify-between items-center">
               <p className="text-xl font-bold">₹0.00</p>
               <button className="bg-blue-500 text-white px-4 py-2 rounded">Add Money</button>
