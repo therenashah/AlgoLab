@@ -5,9 +5,11 @@ import { Search, Bell, Moon, Sun, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <nav className='flex items-center justify-between bg-white dark:bg-gray-900 p-4 shadow-md'>
@@ -34,7 +36,7 @@ export default function Navbar() {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuItem onClick={() => console.log('Profile')}>Profile</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/profileR')}>Profile</DropdownMenuItem>
             <DropdownMenuItem onClick={() => console.log('Settings')}>Settings</DropdownMenuItem>
             <DropdownMenuItem onClick={() => console.log('Logout')}>Logout</DropdownMenuItem>
           </DropdownMenuContent>
